@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация в клан</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: var(--tg-theme-bg-color, #212121);
+            color: var(--tg-theme-text-color, #ffffff);
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 350px;
+        }
+        h3 { margin-bottom: 20px; text-align: center; }
+        
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #aaaaaa);
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--tg-theme-hint-color, #444);
+            background-color: var(--tg-theme-secondary-bg-color, #2f2f2f);
+            color: var(--tg-theme-text-color, #fff);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        
+        input:focus { border-color: #3390ec; }
+
+        .hint {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #777);
+            margin-top: 5px;
+        }
+
+        #mainBtn {
+            margin-top: 30px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h3>📝 Анкета бойца</h3>
+
+        <label for="name">Как зовут в жизни?</label>
+        <input type="text" id="name" placeholder="Иван">
+
+        <label for="nick">Ник в игре</label>
+        <input type="text" id="nick" placeholder="Nagibator">
+
+        <label for="prof">Профессия (Класс)</label>
+        <input type="text" id="prof" placeholder="Спойл / Биш / Танк">
+        <div class="hint">Коротко, на русском или английском</div>
+
+        <button id="mainBtn" onclick="sendData()">💾 Сохранить</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Раскрыть на весь экран
+
+        function sendData() {
+            let name = document.getElementById("name").value.trim();
+            let nick = document.getElementById("nick").value.trim();
+            let prof = document.getElementById("prof").value.trim();
+
+            if (!name || !nick || !prof) {
+                tg.showAlert("Пожалуйста, заполните все поля!");
+                return;
+            }
+
+            // Формируем объект данных
+            let data = {
+                real_name: name,
+                game_nick: nick,
+                game_prof: prof
+            };
+
+            // Отправляем данные боту (в виде строки JSON)
+            tg.sendData(JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
