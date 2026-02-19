@@ -83,28 +83,60 @@
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрыть на весь экран
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        if (tg) { tg.expand(); }
 
-        function sendData() {
+        const params = new URLSearchParams(window.location.search);
+        const uid = params.get("uid") || "";
+        const uname = params.get("uname") || "";
+        const apiUrl = params.get("api") || "https://YOUR_DOMAIN/update";
+
+        function showAlert(message) {
+            if (tg && tg.showAlert) tg.showAlert(message);
+            else alert(message);
+        }
+
+        async function sendData() {
             let name = document.getElementById("name").value.trim();
             let nick = document.getElementById("nick").value.trim();
             let prof = document.getElementById("prof").value.trim();
 
-            if (!name || !nick || !prof) {
-                tg.showAlert("Пожалуйста, заполните все поля!");
+            if (!uid) {
+                showAlert("Не найден ID пользователя. Откройте форму по кнопке в чате.");
                 return;
             }
 
-            // Формируем объект данных
-            let data = {
-                real_name: name,
-                game_nick: nick,
-                game_prof: prof
-            };
+            if (!name || !nick || !prof) {
+                showAlert("Пожалуйста, заполните все поля!");
+                return;
+            }
 
-            // Отправляем данные боту (в виде строки JSON)
-            tg.sendData(JSON.stringify(data));
+            if (apiUrl.indexOf("YOUR_DOMAIN") !== -1) {
+                showAlert("Не настроен адрес сервера для сохранения.");
+                return;
+            }
+
+            try {
+                const resp = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        uid: uid,
+                        uname: uname,
+                        real_name: name,
+                        game_nick: nick,
+                        game_prof: prof
+                    })
+                });
+                const result = await resp.json();
+                if (resp.ok && result.ok) {
+                    showAlert("✅ Данные сохранены!");
+                } else {
+                    showAlert("Ошибка сохранения. Попробуйте позже.");
+                }
+            } catch (e) {
+                showAlert("Ошибка сети. Попробуйте позже.");
+            }
         }
     </script>
 </body>
